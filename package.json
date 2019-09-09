@@ -1,0 +1,24 @@
+{
+  "name": "soumit-bot",
+  "version": "1.0.0",
+  "description": "A melancholy bot.",
+  "main": "bot.js",
+  "scripts": {
+    "start": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "soumit",
+    "bot",
+    "melancholy"
+  ],
+  "author": "Abhishek Datta",
+  "license": "ISC",
+  "dependencies": {
+    "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.2"
+  }
+}
