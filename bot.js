@@ -1,7 +1,8 @@
 var Discord = require('discord.io');
 var logger = require('winston');
 require('dotenv').config();
-var commands = require('./commands.js');
+require('./server'); // mock server for heroku
+var commands = require('./commands');
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
