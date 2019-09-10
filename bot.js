@@ -19,8 +19,21 @@ bot.on('ready', (evt) => {
     logger.info('Connected');
     logger.info('Logged in as: ');
     logger.info(bot.username + ' - (' + bot.id + ')');
+    bot.channelMap = {};
+    for (const channelId in bot.channels) {
+        bot.channelMap[bot.channels[channelId].name] = bot.channels[channelId];
+    }
+    bot.def_channel = bot.channelMap['bot-commands'];
     talk()
 });
+
+bot.on('guildMemberAdd', (member) => {
+    console.log('Entered ', member);
+    bot.sendMessage({
+        to: bot.channelMap['welcome-lounge'].id,
+        message: `Welcome <@${member.id}> to the chilling hub. Ebar tuio P maar.`
+    });
+})
 
 bot.on('message', (user, userID, channelID, message, evt) => {
     const args = message.split(' ');
@@ -31,12 +44,6 @@ bot.on('message', (user, userID, channelID, message, evt) => {
 });
 
 const talk = () => {
-    for (const id in bot.channels) {
-        if (bot.channels[id].name === 'bot-commands') {
-            bot.def_channel = bot.channels[id];
-        }
-    }
-
     // Get process.stdin as the standard input object.
     var standard_input = process.stdin;
 
