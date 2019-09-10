@@ -4,7 +4,8 @@
   "description": "A melancholy bot.",
   "main": "bot.js",
   "scripts": {
-    "start": "nodemon",
+    "start": "node bot.js",
+    "watch": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
