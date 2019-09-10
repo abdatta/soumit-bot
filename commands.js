@@ -54,6 +54,32 @@ exports.voice = (bot, args, user, userID, channelID, message, evt) => {
     }
 }
 
+exports.come = (bot, args, user, userID, channelID, message, evt) => {
+    const to_channel = args.splice(1).join(' ');
+    let found = false;
+    for (const id in bot.channels) {
+        if (bot.channels[id].name === to_channel) {
+            found = true;
+            bot.sendMessage({
+                to: channelID,
+                message: `Ok`
+            });
+            bot.def_channel = bot.channels[id];
+            setTimeout(() =>
+                bot.sendMessage({
+                    to: id,
+                    message: `Bol <@${userID}>`
+            }), 1000)
+        }
+    }
+    if (!found) {
+        bot.sendMessage({
+            to: channelID,
+            message: `Kothay?`
+        });
+    }
+}
+
 exports.DEFUALT = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
