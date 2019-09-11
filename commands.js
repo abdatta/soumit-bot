@@ -1,10 +1,3 @@
-const youtube = {
-    search: require('youtube-search'),
-    stream: require('youtube-audio-stream')
-};
-
-const he = require('he'); // HTML Encoder
-
 exports.ding = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
@@ -15,21 +8,21 @@ exports.ding = (bot, args, user, userID, channelID, message, evt) => {
 exports.s = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
-        message: `Please na bhai na. Abar P marish na. <@${userID}>`
+        message: `Please na bhai na. Abar P marish na.`
     });
 }
 
 exports.placements = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
-        message: `Lol lol kotha bolis na. <@${userID}>`
+        message: `Lol lol kotha bolis na.`
     });
 }
 
 exports.girlfriend = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
-        message: `Gaanja kheyechis? <@${userID}>`
+        message: `Gaanja kheyechis?`
     });
 }
 
@@ -38,7 +31,7 @@ exports.souravyadav =
 exports.caseyneistat = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
-        message: `Seta abar k? <@${userID}>`
+        message: `Seta abar k?`
     });
 }
 
@@ -66,6 +59,13 @@ exports.datta = (bot, args, user, userID, channelID, message, evt) => {
     });
 }
 
+const youtube = {
+    search: require('youtube-search'),
+    stream: require('youtube-audio-stream')
+};
+
+const he = require('he'); // HTML Encoder
+
 exports.baja = (bot, args, user, userID, channelID, message, evt) => {
     const query = args.join(' ');
     youtube.search(query, { maxResults: 1, key: process.env.YOUTUBE_API_KEY}, (err, results) => {
@@ -81,19 +81,45 @@ exports.baja = (bot, args, user, userID, channelID, message, evt) => {
             bot.getAudioContext(bot.channelMap['voice chat hub'].id, (err, stream) => {
                 if(err) return console.log(err);
 
-                youtube.stream(url).pipe(stream, {end: true});
+                youtube.stream(url).pipe(stream, {end: false});
             });
         });
     });
 }
 
-exports.bondo =
-exports.bero = (bot, args, user, userID, channelID, message, evt) => {
-    bot.leaveVoiceChannel(bot.channelMap['voice chat hub'].id, (err) => {
-        if(err) return console.log(err);
+// currently does not work as expected
+exports.bondo = (bot, args, user, userID, channelID, message, evt) => {
+    bot.getAudioContext(bot.channelMap['voice chat hub'].id, (err, stream) => {
+        if (err) {
+            bot.sendMessage({
+                to: channelID,
+                message: `Already bondo to bhai. Kano P marchis? :cold_sweat:`
+            });
+            return console.log(err);
+        }
+
         bot.sendMessage({
             to: channelID,
-            message: `Ok sorry bhai.`
+            message: `Ok bhai bondo korar chesta korchi. Na hole arekbar bolish. :cold_sweat:`
+        });
+
+        stream.stop();
+
+    });
+}
+
+exports.bero = (bot, args, user, userID, channelID, message, evt) => {
+    bot.leaveVoiceChannel(bot.channelMap['voice chat hub'].id, (err) => {
+        if (err) {
+            bot.sendMessage({
+                to: channelID,
+                message: `Already berie achi to bhai. Kano P marchis? :cold_sweat:`
+            });
+            return console.log(err);
+        }
+        bot.sendMessage({
+            to: channelID,
+            message: `Eito berochhi bhai. :cold_sweat:`
         });
     });
 }

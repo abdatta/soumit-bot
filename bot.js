@@ -29,7 +29,6 @@ bot.on('ready', (evt) => {
 });
 
 bot.on('guildMemberAdd', (member) => {
-    console.log('Entered ', member);
     bot.sendMessage({
         to: bot.channelMap['welcome-lounge'].id,
         message: `Welcome <@${member.id}> to the chilling hub. Ebar tuio P maar.`
