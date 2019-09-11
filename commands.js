@@ -61,7 +61,7 @@ exports.datta = (bot, args, user, userID, channelID, message, evt) => {
 
 const youtube = {
     search: require('youtube-search'),
-    stream: require('youtube-audio-stream')
+    stream: require('ytdl-core')
 };
 
 const he = require('he'); // HTML Encoder
@@ -81,7 +81,14 @@ exports.baja = (bot, args, user, userID, channelID, message, evt) => {
             bot.getAudioContext(bot.channelMap['voice chat hub'].id, (err, stream) => {
                 if(err) return console.log(err);
 
-                youtube.stream(url).pipe(stream, {end: false});
+                youtube.stream(url)
+                    .on('error', (err) => {
+                        bot.sendMessage({
+                            to: channelID,
+                            message: `Sorry bhai gondogol hoe gelo. Please P marish na jeno. :cold_sweat: <@${userID}>`
+                        });
+                    })
+                    .pipe(stream, {end: false});
             });
         });
     });
@@ -93,14 +100,14 @@ exports.bondo = (bot, args, user, userID, channelID, message, evt) => {
         if (err) {
             bot.sendMessage({
                 to: channelID,
-                message: `Already bondo to bhai. Kano P marchis? :cold_sweat:`
+                message: `Already bondo to bhai. Kano P marchis? :disappointed_relieved:`
             });
             return console.log(err);
         }
 
         bot.sendMessage({
             to: channelID,
-            message: `Ok bhai bondo korar chesta korchi. Na hole arekbar bolish. :cold_sweat:`
+            message: `Ok bhai bondo korar chesta korchi. Na hole arekbar bolish. :disappointed_relieved:`
         });
 
         stream.stop();
@@ -113,13 +120,13 @@ exports.bero = (bot, args, user, userID, channelID, message, evt) => {
         if (err) {
             bot.sendMessage({
                 to: channelID,
-                message: `Already berie achi to bhai. Kano P marchis? :cold_sweat:`
+                message: `Already berie achi to bhai. Kano P marchis? :disappointed_relieved:`
             });
             return console.log(err);
         }
         bot.sendMessage({
             to: channelID,
-            message: `Eito berochhi bhai. :cold_sweat:`
+            message: `Ok berochhi bhai. :disappointed_relieved:`
         });
     });
 }
@@ -150,6 +157,6 @@ exports.come = (bot, args, user, userID, channelID, message, evt) => {
 exports.DEFUALT = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
-        message: `R bolish na. Jibon tai akta black hole. <@${userID}>`
+        message: `R bolish na. Jibon tai akta black hole.`
     });
 }
