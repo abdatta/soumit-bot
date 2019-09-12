@@ -85,7 +85,7 @@ const youtube = {
 const he = require('he'); // HTML Encoder
 
 exports.baja = (bot, args, user, userID, channelID, message, evt) => {
-    const query = args.join(' ');
+    const query = preprocess_specials(args.join(' '));
     youtube.search(query, { maxResults: 1, key: process.env.YOUTUBE_API_KEY}, (err, results) => {
         if(err) return console.log(err);
 
@@ -113,6 +113,11 @@ exports.baja = (bot, args, user, userID, channelID, message, evt) => {
             });
         });
     });
+
+const preprocess_specials = (query) => {
+    if (['soumit', 'bot', 'anthem'].every(word => query.includes(word))) {
+        return 'gaand me danda';
+    }
 }
 
 exports.bondo = (bot, args, user, userID, channelID, message, evt) => {
