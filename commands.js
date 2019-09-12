@@ -113,6 +113,7 @@ exports.baja = (bot, args, user, userID, channelID, message, evt) => {
             });
         });
     });
+}
 
 const preprocess_specials = (query) => {
     if (['soumit', 'bot', 'anthem'].every(word => query.includes(word))) {
