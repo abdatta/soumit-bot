@@ -59,6 +59,24 @@ exports.datta = (bot, args, user, userID, channelID, message, evt) => {
     });
 }
 
+exports.voice = (bot, args, user, userID, channelID, message, evt) => {
+
+    const user_voice_channel_id = bot.servers[bot.channels[channelID].guild_id].members[userID].voice_channel_id;
+    if (!user_voice_channel_id) {
+        return bot.sendMessage({
+            to: channelID,
+            message: `Toke kono voice channel e khujei pelam na :disappointed_relieved:`
+        });
+    }
+
+    bot.sendMessage({
+        to: channelID,
+        message: `Ok aschi bhai.`
+    });
+
+    bot.joinVoiceChannel(user_voice_channel_id);
+}
+
 const youtube = {
     search: require('youtube-search'),
     stream: require('ytdl-core')
@@ -71,43 +89,51 @@ exports.baja = (bot, args, user, userID, channelID, message, evt) => {
     youtube.search(query, { maxResults: 1, key: process.env.YOUTUBE_API_KEY}, (err, results) => {
         if(err) return console.log(err);
 
+        const user_voice_channel_id = bot.servers[bot.channels[channelID].guild_id].members[userID].voice_channel_id;
+        if (!user_voice_channel_id) {
+            return bot.sendMessage({
+                to: channelID,
+                message: `Toke kono voice channel e khujei pelam na :disappointed_relieved:`
+            });
+        }
+
         bot.sendMessage({
             to: channelID,
             message: `Ok bajachhi  :drum:  \`${he.decode(results[0].title)}\``
         });
 
         const url = results[0].link;
-        bot.joinVoiceChannel(bot.channelMap['voice chat hub'].id, (err) => {
-            bot.getAudioContext(bot.channelMap['voice chat hub'].id, (err, stream) => {
+        bot.joinVoiceChannel(user_voice_channel_id, (err) => {
+            bot.getAudioContext(user_voice_channel_id, (err, stream) => {
                 if(err) return console.log(err);
 
                 youtube.stream(url)
-                    .on('error', (err) => {
-                        bot.sendMessage({
-                            to: channelID,
-                            message: `Sorry bhai gondogol hoe gelo. Please P marish na jeno. :cold_sweat: <@${userID}>`
-                        });
-                    })
+                    .on('error', (err) => handleError(bot, args, user, userID, channelID, message, evt))
                     .pipe(stream, {end: false});
             });
         });
     });
 }
 
-// currently does not work as expected
 exports.bondo = (bot, args, user, userID, channelID, message, evt) => {
-    bot.getAudioContext(bot.channelMap['voice chat hub'].id, (err, stream) => {
+
+    const bot_voice_channel_id = bot.servers[bot.channels[channelID].guild_id].members[bot.id].voice_channel_id
+    if (!bot_voice_channel_id) {
+        return bot.sendMessage({
+            to: channelID,
+            message: `Already bondo to bhai. Kano P marchis? :disappointed_relieved:`
+        });
+    }
+
+    bot.getAudioContext(bot_voice_channel_id, (err, stream) => {
         if (err) {
-            bot.sendMessage({
-                to: channelID,
-                message: `Already bondo to bhai. Kano P marchis? :disappointed_relieved:`
-            });
+            handleError(bot, args, user, userID, channelID, message, evt);
             return console.log(err);
         }
 
         bot.sendMessage({
             to: channelID,
-            message: `Ok bhai bondo korar chesta korchi. Na hole arekbar bolish. :disappointed_relieved:`
+            message: `Ok sorry bhai. :disappointed_relieved:`
         });
 
         stream.stop();
@@ -116,12 +142,18 @@ exports.bondo = (bot, args, user, userID, channelID, message, evt) => {
 }
 
 exports.bero = (bot, args, user, userID, channelID, message, evt) => {
-    bot.leaveVoiceChannel(bot.channelMap['voice chat hub'].id, (err) => {
+    const bot_voice_channel_id = bot.servers[bot.channels[channelID].guild_id].members[bot.id].voice_channel_id
+
+    if (!bot_voice_channel_id) {
+        return bot.sendMessage({
+            to: channelID,
+            message: `Already berie achi to bhai. Kano P marchis? :disappointed_relieved:`
+        });
+    }
+
+    bot.leaveVoiceChannel(bot_voice_channel_id, (err) => {
         if (err) {
-            bot.sendMessage({
-                to: channelID,
-                message: `Already berie achi to bhai. Kano P marchis? :disappointed_relieved:`
-            });
+            handleError(bot, args, user, userID, channelID, message, evt);
             return console.log(err);
         }
         bot.sendMessage({
@@ -158,5 +190,12 @@ exports.DEFUALT = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
         message: `R bolish na. Jibon tai akta black hole.`
+    });
+}
+
+const handleError = (bot, args, user, userID, channelID, message, evt) => {
+    bot.sendMessage({
+        to: channelID,
+        message: `Sorry bhai kichu gondogol hoe gelo. Please P marish na jeno. :cold_sweat: <@${userID}>`
     });
 }
