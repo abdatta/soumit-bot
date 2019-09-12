@@ -119,9 +119,10 @@ const preprocess_specials = (query) => {
     if (['soumit', 'bot', 'anthem'].every(word => query.includes(word))) {
         return 'gaand me danda';
     }
+    return query;
 }
 
-exports.bondo = (bot, args, user, userID, channelID, message, evt) => {
+exports.bondho = (bot, args, user, userID, channelID, message, evt) => {
 
     const bot_voice_channel_id = bot.servers[bot.channels[channelID].guild_id].members[bot.id].voice_channel_id
     if (!bot_voice_channel_id) {
