@@ -39,9 +39,14 @@ bot.on('message', (user, userID, channelID, message, evt) => {
     const prefix = (process.env.PREFIX || 'soumit-dev').toLowerCase();
     const args = message.split(' ');
     if (args[0].toLowerCase() === prefix) {
+        logger.info(message);
         const cmd = args[1].toLowerCase();
         (commands[cmd] || commands.DEFUALT)(bot, args.splice(2), user, userID, channelID, message, evt);
     }
+});
+
+bot.on('disconnect', (errMsg, code) => {
+    console.log('Disconnected!');
 });
 
 const talk = () => {

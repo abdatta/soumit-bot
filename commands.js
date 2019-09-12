@@ -8,7 +8,7 @@ exports.ding = (bot, args, user, userID, channelID, message, evt) => {
 exports.s = (bot, args, user, userID, channelID, message, evt) => {
     bot.sendMessage({
         to: channelID,
-        message: `Please na bhai na. Abar P marish na.`
+        message: `Please na bhai na. Abar P marish na. :pray:`
     });
 }
 
@@ -60,12 +60,11 @@ exports.datta = (bot, args, user, userID, channelID, message, evt) => {
 }
 
 exports.voice = (bot, args, user, userID, channelID, message, evt) => {
-
     const user_voice_channel_id = bot.servers[bot.channels[channelID].guild_id].members[userID].voice_channel_id;
     if (!user_voice_channel_id) {
         return bot.sendMessage({
             to: channelID,
-            message: `Toke kono voice channel e khujei pelam na :disappointed_relieved:`
+            message: `Toke kono voice channel e khujei pelam na. :disappointed_relieved:`
         });
     }
 
@@ -85,6 +84,13 @@ const youtube = {
 const he = require('he'); // HTML Encoder
 
 exports.baja = (bot, args, user, userID, channelID, message, evt) => {
+    if (bot.lastYoutubeStream && !bot.lastYoutubeStream.readableEnded) {
+        return bot.sendMessage({
+            to: channelID,
+            message: `Kota aksathe bajabo bhai. Aktai to P ache. :disappointed_relieved:`
+        });
+    }
+
     const query = preprocess_specials(args.join(' '));
     youtube.search(query, { maxResults: 1, key: process.env.YOUTUBE_API_KEY}, (err, results) => {
         if(err) return console.log(err);
@@ -93,7 +99,14 @@ exports.baja = (bot, args, user, userID, channelID, message, evt) => {
         if (!user_voice_channel_id) {
             return bot.sendMessage({
                 to: channelID,
-                message: `Toke kono voice channel e khujei pelam na :disappointed_relieved:`
+                message: `Toke kono voice channel e khujei pelam na. :disappointed_relieved:`
+            });
+        }
+
+        if (!results || !results.length) {
+            return bot.sendMessage({
+                to: channelID,
+                message: `Aktao gaan khuje pelam na re. :worried:`
             });
         }
 
@@ -107,19 +120,28 @@ exports.baja = (bot, args, user, userID, channelID, message, evt) => {
             bot.getAudioContext(user_voice_channel_id, (err, stream) => {
                 if(err) return console.log(err);
 
-                youtube.stream(url)
-                    .on('error', (err) => handleError(bot, args, user, userID, channelID, message, evt))
-                    .pipe(stream, {end: false});
+                bot.lastYoutubeStream = youtube.stream(url);
+                bot.lastYoutubeStream
+                   .on('error', (err) => handleError(err, bot, args, user, userID, channelID, message, evt))
+                   .pipe(stream, {end: false});
+                stream.on('done', () => bot.lastYoutubeStream = null);
             });
         });
     });
 }
 
 const preprocess_specials = (query) => {
-    if (['soumit', 'bot', 'anthem'].every(word => query.includes(word))) {
+    if (['soumit', 'anthem'].every(word => query.includes(word))) {
         return 'gaand me danda';
     }
     return query;
+}
+
+exports.bondo = (bot, args, user, userID, channelID, message, evt) => {
+    bot.sendMessage({
+        to: channelID,
+        message: `Bhai ami ja jani 'bondo' bole to kichu hoena, 'bondho' hoe tobe. Kichu bhul bolle khoma korish. :pray:`
+    });
 }
 
 exports.bondho = (bot, args, user, userID, channelID, message, evt) => {
@@ -134,7 +156,7 @@ exports.bondho = (bot, args, user, userID, channelID, message, evt) => {
 
     bot.getAudioContext(bot_voice_channel_id, (err, stream) => {
         if (err) {
-            handleError(bot, args, user, userID, channelID, message, evt);
+            handleError(err, bot, args, user, userID, channelID, message, evt);
             return console.log(err);
         }
 
@@ -143,6 +165,7 @@ exports.bondho = (bot, args, user, userID, channelID, message, evt) => {
             message: `Ok sorry bhai. :disappointed_relieved:`
         });
 
+        bot.lastYoutubeStream = null;
         stream.stop();
 
     });
@@ -160,9 +183,10 @@ exports.bero = (bot, args, user, userID, channelID, message, evt) => {
 
     bot.leaveVoiceChannel(bot_voice_channel_id, (err) => {
         if (err) {
-            handleError(bot, args, user, userID, channelID, message, evt);
+            handleError(err, bot, args, user, userID, channelID, message, evt);
             return console.log(err);
         }
+        bot.lastYoutubeStream = null;
         bot.sendMessage({
             to: channelID,
             message: `Ok berochhi bhai. :disappointed_relieved:`
@@ -200,7 +224,8 @@ exports.DEFUALT = (bot, args, user, userID, channelID, message, evt) => {
     });
 }
 
-const handleError = (bot, args, user, userID, channelID, message, evt) => {
+const handleError = (err, bot, args, user, userID, channelID, message, evt) => {
+    console.log('Error: ', err);
     bot.sendMessage({
         to: channelID,
         message: `Sorry bhai kichu gondogol hoe gelo. Please P marish na jeno. :cold_sweat: <@${userID}>`
